@@ -1,0 +1,870 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nic — SSer Portfolio</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #05050E;
+  color: #e2e8f0;
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* ---- Scroll Progress ---- */
+#scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #8B5CF6, #EC4899);
+  z-index: 100;
+  width: 0%;
+  transition: width 0.1s;
+}
+
+/* ---- Nebula ---- */
+#nebula-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+#nebula-bg .cloud {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0;
+  animation: nebDrift 20s ease-in-out infinite alternate;
+}
+#nebula-bg .cloud:nth-child(1) { width: 500px; height: 500px; top: 5%; left: -10%; background: rgba(139,92,246,0.05); animation-delay: 0s; }
+#nebula-bg .cloud:nth-child(2) { width: 400px; height: 400px; bottom: 10%; right: 5%; background: rgba(236,72,153,0.04); animation-delay: -7s; }
+#nebula-bg .cloud:nth-child(3) { width: 350px; height: 350px; top: 40%; left: 30%; background: rgba(100,60,200,0.03); animation-delay: -14s; }
+@keyframes nebDrift {
+  0% { opacity: 0.2; transform: scale(1) translate(0, 0); }
+  100% { opacity: 0.6; transform: scale(1.2) translate(15px, -15px); }
+}
+
+/* ---- Constellation Grid ---- */
+#constellations {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.1;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 100px, rgba(139,92,246,0.025) 100px, rgba(139,92,246,0.025) 101px),
+    repeating-linear-gradient(90deg, transparent, transparent 100px, rgba(139,92,246,0.025) 100px, rgba(139,92,246,0.025) 101px);
+}
+
+/* ---- Stars Canvas ---- */
+#stars-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+/* ---- Crescent Moon (top-right) ---- */
+#moon-wrapper {
+  position: fixed;
+  top: 50px;
+  right: 70px;
+  z-index: 0;
+  pointer-events: none;
+  animation: moonFloat 8s ease-in-out infinite alternate;
+}
+#moon-glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 400px; height: 400px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200,190,255,0.04) 0%, rgba(139,92,246,0.015) 30%, transparent 60%);
+  animation: moonPulse 5s ease-in-out infinite alternate;
+}
+@keyframes moonPulse {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+  100% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+}
+/* Crescent moon using overlapping circles */
+#moon {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  position: relative;
+  background: radial-gradient(circle at 40% 35%, #f0e8f8, #d4c8e8 20%, #b8a8d4 40%, #9a88b8 60%, #7a689a 80%, #5a4878);
+  box-shadow:
+    inset -8px -8px 30px rgba(0,0,0,0.3),
+    inset 4px 4px 15px rgba(255,255,255,0.05),
+    0 0 30px rgba(200,190,255,0.06);
+  overflow: hidden;
+}
+/* Dark overlay circle creates crescent */
+#moon::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: 30px;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: #05050E;
+  box-shadow: 0 0 20px rgba(5,5,14,0.5);
+}
+/* Surface details on visible crescent */
+#moon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 60% 40%, rgba(200,190,220,0.06) 0%, transparent 15%),
+    radial-gradient(circle at 75% 55%, rgba(200,190,220,0.04) 0%, transparent 10%),
+    radial-gradient(circle at 50% 70%, rgba(200,190,220,0.03) 0%, transparent 12%),
+    radial-gradient(circle at 80% 30%, rgba(200,190,220,0.05) 0%, transparent 8%),
+    radial-gradient(circle at 65% 80%, rgba(200,190,220,0.03) 0%, transparent 14%);
+  pointer-events: none;
+}
+/* Crater details on crescent */
+#moon .crater {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, rgba(100,80,120,0.15), rgba(40,30,55,0.2) 50%, transparent 70%);
+  box-shadow: inset 1px 1px 2px rgba(0,0,0,0.1);
+}
+#moon .crater:nth-child(1) { width: 20px; height: 19px; top: 30px; left: 95px; }
+#moon .crater:nth-child(2) { width: 12px; height: 12px; top: 70px; left: 110px; }
+#moon .crater:nth-child(3) { width: 8px; height: 8px; top: 105px; left: 88px; }
+#moon .crater:nth-child(4) { width: 15px; height: 14px; top: 50px; left: 125px; }
+#moon .crater:nth-child(5) { width: 6px; height: 6px; top: 120px; left: 120px; }
+#moon .crater:nth-child(6) { width: 10px; height: 10px; top: 90px; left: 132px; }
+/* Micro texture overlay clipped to crescent */
+#moon .texture {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 55% 30%, rgba(200,190,220,0.02) 0%, transparent 5%),
+    radial-gradient(circle at 70% 45%, rgba(200,190,220,0.015) 0%, transparent 4%),
+    radial-gradient(circle at 60% 65%, rgba(200,190,220,0.02) 0%, transparent 5%),
+    radial-gradient(circle at 80% 50%, rgba(200,190,220,0.015) 0%, transparent 4%),
+    radial-gradient(circle at 65% 85%, rgba(200,190,220,0.02) 0%, transparent 4%),
+    radial-gradient(circle at 90% 35%, rgba(200,190,220,0.015) 0%, transparent 3%);
+  pointer-events: none;
+}
+/* Lighting on crescent */
+#moon .lighting {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255,255,255,0.06) 0%, transparent 35%),
+    radial-gradient(circle at 75% 75%, rgba(0,0,0,0.05) 0%, transparent 40%);
+  pointer-events: none;
+}
+/* Thin glow edge on dark side */
+#moon .edge {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 1px solid rgba(200,190,255,0.04);
+  box-shadow: 0 0 20px 2px rgba(200,190,255,0.02);
+  pointer-events: none;
+}
+@keyframes moonFloat {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
+
+/* ---- Mouse Glow ---- */
+#glow {
+  position: fixed;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139,92,246,0.05) 0%, transparent 70%);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  transition: left 0.15s ease-out, top 0.15s ease-out;
+}
+
+/* ---- Splash ---- */
+#splash {
+  position: fixed;
+  inset: 0; z-index: 20;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: #05050E;
+  transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+#splash.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+#splash .avatar {
+  width: 130px; height: 130px; border-radius: 50%; object-fit: cover;
+  border: 3px solid rgba(139,92,246,0.3);
+  box-shadow: 0 0 40px rgba(139,92,246,0.15), 0 0 0 1px rgba(139,92,246,0.08);
+  margin-bottom: 24px; animation: pulse 3s ease-in-out infinite;
+}
+#splash h1 {
+  font-size: 40px; font-weight: 700; letter-spacing: -1px;
+  background: linear-gradient(135deg, #8B5CF6, #EC4899);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 6px;
+}
+#splash p { color: #6b7280; font-size: 15px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 32px; }
+#enter-btn {
+  padding: 14px 48px; border-radius: 50px; border: 1px solid rgba(139,92,246,0.4);
+  background: rgba(139,92,246,0.08); color: #8B5CF6; font-size: 16px; font-weight: 600;
+  cursor: pointer; transition: all 0.3s; letter-spacing: 1px; text-transform: uppercase;
+}
+#enter-btn:hover {
+  background: rgba(139,92,246,0.15); border-color: #8B5CF6;
+  box-shadow: 0 0 30px rgba(139,92,246,0.15); transform: scale(1.03);
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(139,92,246,0.15), 0 0 0 1px rgba(139,92,246,0.08); }
+  50% { box-shadow: 0 0 50px rgba(139,92,246,0.3), 0 0 0 1px rgba(139,92,246,0.12); }
+}
+
+/* ---- Content ---- */
+#content { opacity: 0; transition: opacity 0.8s ease 0.3s; position: relative; z-index: 1; }
+#content.show { opacity: 1; }
+.container { max-width: 960px; margin: 0 auto; padding: 48px 28px 80px; position: relative; z-index: 1; }
+
+/* ---- Section Divider ---- */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(139,92,246,0.2), rgba(236,72,153,0.2), transparent);
+  margin: 56px 0; opacity: 0; animation: fadeIn 0.6s ease both;
+}
+
+/* ---- Profile Card ---- */
+.profile-card {
+  background: rgba(20,15,40,0.5);
+  border: 1px solid #1f1a3a;
+  border-radius: 16px;
+  padding: 40px 36px 28px;
+  margin-bottom: 0;
+  animation: fadeUp 0.8s ease both;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.profile-card:hover {
+  border-color: rgba(139,92,246,0.3);
+  box-shadow: 0 0 40px rgba(139,92,246,0.08);
+}
+
+/* ---- Header ---- */
+header { text-align: center; padding: 0 0 40px; animation: fadeDown 0.8s ease; position: relative; }
+header .avatar {
+  width: 140px; height: 140px; border-radius: 50%; object-fit: cover;
+  border: 3px solid rgba(139,92,246,0.3);
+  box-shadow: 0 0 40px rgba(139,92,246,0.15), 0 0 0 1px rgba(139,92,246,0.08);
+  margin-bottom: 24px; transition: transform 0.3s;
+}
+header .avatar:hover { transform: scale(1.05); }
+header h1 {
+  font-size: 56px; font-weight: 700; letter-spacing: -2px;
+  background: linear-gradient(135deg, #8B5CF6, #EC4899);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+header .sub { color: #6b7280; font-size: 18px; margin-top: 10px; letter-spacing: 3px; text-transform: uppercase; min-height: 1.4em; }
+header .sub .cursor {
+  display: inline-block; width: 2px; height: 1.1em; background: #8B5CF6;
+  margin-left: 2px; vertical-align: text-bottom; animation: blink 1s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+header .badge {
+  display: inline-block; margin-top: 16px; padding: 8px 24px; border-radius: 50px;
+  border: 1px solid #1f1a3a; font-size: 14px; color: #9ca3af; background: rgba(139,92,246,0.06);
+  transition: border-color 0.3s;
+}
+header .badge:hover { border-color: rgba(139,92,246,0.3); }
+
+/* ---- Social Links ---- */
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 22px;
+  animation: fadeUp 0.8s ease 0.2s both;
+}
+.social-links a, .social-links .social-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 8px;
+  border: 1px solid #1f1a3a;
+  background: rgba(20,15,40,0.4);
+  color: #9ca3af;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.25s;
+  cursor: pointer;
+}
+.social-links a:hover, .social-links .social-btn:hover {
+  border-color: rgba(139,92,246,0.35);
+  color: #e2e8f0;
+  background: rgba(139,92,246,0.06);
+}
+.social-links svg { width: 20px; height: 20px; flex-shrink: 0; }
+.social-links .github:hover svg { fill: #e2e8f0; }
+.social-links .discord:hover svg { fill: #5865F2; }
+.social-links .discord.copied { border-color: #5865F2; color: #5865F2; }
+.social-links .discord.copied svg { fill: #5865F2; }
+/* ---- Stats ---- */
+.stats { display: flex; justify-content: center; gap: 56px; margin-bottom: 0; animation: fadeUp 0.8s ease 0.15s both; }
+.stat { text-align: center; position: relative; }
+.stat:not(:last-child)::after {
+  content: ''; position: absolute; right: -28px; top: 50%; transform: translateY(-50%);
+  width: 1px; height: 36px;
+  background: linear-gradient(to bottom, transparent, rgba(139,92,246,0.2), transparent);
+}
+.stat .num { font-size: 56px; font-weight: 700; color: #8B5CF6; line-height: 1; }
+.stat .lbl { font-size: 18px; color: #6b7280; text-transform: uppercase; letter-spacing: 2px; margin-top: 8px; }
+.stat .num .flag { font-size: 40px; line-height: 1; }
+
+/* ---- Language Bar ---- */
+.lang-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 32px;
+  animation: fadeUp 0.8s ease 0.2s both;
+}
+.lang-bar-label {
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: #6b7280;
+}
+.lang-bar-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.lang-bar-tags .lang-tag {
+  font-size: 16px;
+  padding: 8px 22px;
+  border-radius: 50px;
+  background: rgba(139,92,246,0.1);
+  border: 1px solid rgba(139,92,246,0.2);
+  color: #A78BFA;
+  transition: all 0.25s;
+  cursor: default;
+}
+.lang-bar-tags .lang-tag:hover {
+  background: rgba(139,92,246,0.18);
+  border-color: rgba(139,92,246,0.35);
+}
+
+/* ---- Sections ---- */
+section { margin-bottom: 0; animation: fadeUp 0.8s ease both; }
+.section-title {
+  font-size: 16px; text-transform: uppercase; letter-spacing: 4px; color: #8B5CF6;
+  margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; gap: 16px;
+}
+.section-title::before, .section-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(139,92,246,0.2));
+}
+.section-title::after { background: linear-gradient(90deg, rgba(139,92,246,0.2), transparent); }
+
+/* ---- Role Tag ---- */
+.role-tag {
+  display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px; margin-left: 8px; vertical-align: middle; flex-shrink: 0;
+}
+.role-sser { background: rgba(139,92,246,0.15); color: #A78BFA; border: 1px solid rgba(139,92,246,0.3); }
+.role-sser:hover { background: rgba(139,92,246,0.22); }
+.role-ex { background: rgba(107,114,128,0.15); color: #9ca3af; border: 1px solid rgba(107,114,128,0.3); }
+.role-ex:hover { background: rgba(107,114,128,0.22); }
+.role-head { background: rgba(236,72,153,0.15); color: #F472B6; border: 1px solid rgba(236,72,153,0.3); }
+.role-head:hover { background: rgba(236,72,153,0.22); }
+.role-manager { background: rgba(251,191,36,0.15); color: #FBBF24; border: 1px solid rgba(251,191,36,0.3); }
+.role-manager:hover { background: rgba(251,191,36,0.22); }
+
+/* ---- Server Table ---- */
+.server-table { width: 100%; border-collapse: collapse; }
+.server-table > div {
+  display: flex; align-items: center; padding: 14px 18px;
+  border-bottom: 1px solid rgba(30,22,60,0.5); transition: all 0.2s ease; cursor: default;
+}
+.server-table > div:hover { background: rgba(139,92,246,0.03); }
+.server-table > div:last-child { border-bottom: none; }
+.server-table .dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  background: #1f1a3a; margin-right: 16px; transition: all 0.3s;
+}
+.server-table > div:hover .dot { background: #8B5CF6; box-shadow: 0 0 10px rgba(139,92,246,0.4); }
+.server-table .name { font-size: 16px; font-weight: 500; flex: 1; }
+.server-table .role-tag { flex-shrink: 0; font-size: 11px; padding: 3px 12px; }
+
+/* ---- Scroll Indicator ---- */
+#scroll-indicator {
+  position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); z-index: 5;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  color: #4b5563; font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  opacity: 0; animation: fadeIn 1s ease 1.5s forwards; transition: opacity 0.4s;
+}
+#scroll-indicator.hidden { opacity: 0; }
+#scroll-indicator .arrow {
+  width: 16px; height: 16px; border-right: 1.5px solid #4b5563; border-bottom: 1.5px solid #4b5563;
+  transform: rotate(45deg); animation: scrollBounce 2s ease-in-out infinite;
+}
+@keyframes scrollBounce {
+  0%, 100% { transform: rotate(45deg) translateY(0); }
+  50% { transform: rotate(45deg) translateY(4px); }
+}
+
+/* ---- Music Toggle ---- */
+#music-btn {
+  position: fixed; bottom: 24px; right: 24px; z-index: 10;
+  width: 44px; height: 44px; border-radius: 50%; border: 1px solid #1f1a3a;
+  background: rgba(20,15,40,0.8); color: #6b7280; font-size: 18px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.25s; backdrop-filter: blur(8px);
+}
+#music-btn:hover { border-color: #8B5CF6; color: #8B5CF6; }
+#music-btn.playing { color: #EC4899; border-color: #EC4899; box-shadow: 0 0 15px rgba(236,72,153,0.1); }
+
+/* ---- Footer ---- */
+footer { text-align: center; margin-top: 60px; padding-top: 24px; border-top: 1px solid #1f1a3a; font-size: 13px; color: #4b5563; }
+
+/* ---- Animations ---- */
+@keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  #moon-wrapper { top: 30px; right: 30px; }
+  #moon { width: 120px; height: 120px; }
+  #moon::before { width: 100px; height: 100px; top: -10px; left: 20px; }
+  #moon-glow { width: 300px; height: 300px; }
+}
+@media (max-width: 600px) {
+  header h1 { font-size: 36px; }
+  .stats { gap: 24px; }
+  .stat .num { font-size: 28px; }
+  .stat:not(:last-child)::after { display: none; }
+  .lang-bar { flex-direction: column; gap: 14px; }
+  .lang-bar-tags .lang-tag { font-size: 14px; padding: 6px 16px; }
+  #splash h1 { font-size: 28px; }
+  #splash .avatar { width: 100px; height: 100px; }
+  #moon-wrapper { top: 20px; right: 20px; }
+  #moon { width: 80px; height: 80px; }
+  #moon::before { width: 66px; height: 66px; top: -6px; left: 14px; }
+  #moon-glow { width: 200px; height: 200px; }
+  .section-title::before, .section-title::after { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div id="scroll-progress"></div>
+
+<div id="nebula-bg">
+  <div class="cloud"></div>
+  <div class="cloud"></div>
+  <div class="cloud"></div>
+</div>
+<div id="constellations"></div>
+<canvas id="stars-canvas"></canvas>
+<div id="glow"></div>
+
+<!-- Crescent Moon -->
+<div id="moon-wrapper">
+  <div id="moon-glow"></div>
+  <div id="moon">
+    <div class="crater"></div>
+    <div class="crater"></div>
+    <div class="crater"></div>
+    <div class="crater"></div>
+    <div class="crater"></div>
+    <div class="crater"></div>
+    <div class="texture"></div>
+    <div class="lighting"></div>
+    <div class="edge"></div>
+  </div>
+</div>
+
+<!-- Splash -->
+<div id="splash">
+  <img src="164.jpg" alt="Nic" class="avatar">
+  <h1>Nic</h1>
+  <p>Screen Sharing Specialist</p>
+  <button id="enter-btn">&#9835; Enter</button>
+</div>
+
+<div id="scroll-indicator">
+  <span>Scroll</span>
+  <div class="arrow"></div>
+</div>
+
+<div id="content">
+  <div class="container">
+    <div class="profile-card">
+    <header>
+      <img src="164.jpg" alt="Nic" class="avatar">
+      <h1>Nic</h1>
+      <div class="sub" id="typing-sub"></div>
+      <div class="badge">30+ communities &middot; 4+ years experience</div>
+      <div class="social-links">
+        <a href="https://github.com/Nickk196" target="_blank" class="github">
+          <svg viewBox="0 0 16 16" fill="#9ca3af"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+        <div class="social-btn discord" onclick="copyDiscord()" title="Click to copy">
+          <svg viewBox="0 0 16 16" fill="#9ca3af"><path d="M13.545 2.907a13.227 13.227 0 00-3.257-1.011.05.05 0 00-.052.025c-.141.25-.297.577-.406.833a12.19 12.19 0 00-3.658 0 8.258 8.258 0 00-.412-.833.05.05 0 00-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 00-.021.018C.356 6.024-.213 9.047.066 12.032c.001.014.01.028.021.037a13.275 13.275 0 003.995 2.02.05.05 0 00.056-.019c.308-.42.582-.863.818-1.329a.05.05 0 00-.027-.069 8.739 8.739 0 01-1.248-.595.05.05 0 01-.005-.084c.084-.062.168-.128.248-.195a.05.05 0 01.05-.01c2.614 1.195 5.453 1.195 8.027 0a.05.05 0 01.053.01c.08.067.164.133.248.195a.05.05 0 01-.004.084 8.27 8.27 0 01-1.249.594.05.05 0 00-.027.07c.236.466.51.909.817 1.329a.05.05 0 00.056.019 13.25 13.25 0 003.996-2.02.05.05 0 00.021-.037c.334-3.395-.559-6.394-2.366-9.106a.03.03 0 00-.02-.019zm-8.198 7.307c-.789 0-1.438-.725-1.438-1.612 0-.887.637-1.613 1.438-1.613.807 0 1.45.72 1.438 1.613 0 .887-.637 1.612-1.438 1.612zm5.316 0c-.788 0-1.438-.725-1.438-1.612 0-.887.637-1.613 1.438-1.613.807 0 1.45.72 1.438 1.613 0 .887-.637 1.612-1.438 1.612z"/></svg>
+          Discord
+        </div>
+      </div>
+    </header>
+
+    <div class="stats">
+      <div class="stat"><div class="num">30+</div><div class="lbl">Servers</div></div>
+      <div class="stat"><div class="num">4+</div><div class="lbl">Years</div></div>
+      <div class="stat"><div class="num">16</div><div class="lbl">Age</div></div>
+      <div class="stat"><div class="num">&#127463;&#127466;</div><div class="lbl">Romania</div></div>
+    </div>
+    <div class="lang-bar">
+      <span class="lang-bar-label">Languages</span>
+      <div class="lang-bar-tags">
+        <span class="lang-tag">English</span>
+        <span class="lang-tag">Romanian</span>
+        <span class="lang-tag">Spanish</span>
+        <span class="lang-tag">Russian</span>
+      </div>
+    </div>
+    </div>
+
+    <section>
+      <div class="section-title">&#9679; Active Positions</div>
+      <div class="server-table">
+        <div><div class="dot"></div><span class="name">BoxPvP</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">ScreenShare Alliance</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">Minecraft ScreenShare Community</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">FadedMC</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">BirdVanilla</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">ClashVanilla</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">AquaticSMP</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">Xylon</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">Snow Vanilla TierList</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">Lucnoxity Network</span><span class="role-tag role-manager">SS Manager</span></div>
+        <div><div class="dot"></div><span class="name">Nova Tiers</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">Lunar Tiers</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">Astral TierList</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">FranceTiers</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">Elysian TierList</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">Cube TierList</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">Solitary TierList</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">MineTiers</span><span class="role-tag role-head">Head SSer</span></div>
+        <div><div class="dot"></div><span class="name">Ryzon TierList</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">Blitz Tiers</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">Cube Network</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">Vanilla PvP Community</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">Apex Tiers</span><span class="role-tag role-head">Head SSer</span></div>
+        <div><div class="dot"></div><span class="name">Vanilla Prot Community</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">CrystalHub</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">Indian Tiers</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">CreakGens</span><span class="role-tag role-sser">SSer</span></div>
+        <div><div class="dot"></div><span class="name">Prestige TierList</span><span class="role-tag role-sser">SSer</span></div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <section>
+      <div class="section-title">&#9679; Former Positions</div>
+      <div class="server-table">
+        <div><div class="dot"></div><span class="name">Vikur Network</span><span class="role-tag role-ex">Ex. SSer</span></div>
+        <div><div class="dot"></div><span class="name">Vincent Vanilla</span><span class="role-tag role-ex">Ex. SSer</span></div>
+        <div><div class="dot"></div><span class="name">EuVanilla</span><span class="role-tag role-ex">Ex. SSer</span></div>
+        <div><div class="dot"></div><span class="name">SiegeLands</span><span class="role-tag role-ex">Ex. SSer</span></div>
+        <div><div class="dot"></div><span class="name">Crystal Ranked</span><span class="role-tag role-ex">Ex. SSer</span></div>
+        <div><div class="dot"></div><span class="name">Solace Vanilla</span><span class="role-tag role-ex">Ex. SSer</span></div>
+      </div>
+    </section>
+
+    <footer>Nic &mdash; SSer Portfolio &mdash; 2026</footer>
+  </div>
+</div>
+
+<audio id="bg-music" loop preload="auto"><source src="Eminem - Mockingbird [Official Music Video].mp3" type="audio/mpeg"></audio>
+<button id="music-btn" title="Toggle Music">&#9835;</button>
+
+<script>
+// ---- Scroll Progress ----
+const progressBar = document.getElementById('scroll-progress');
+window.addEventListener('scroll', function() {
+  const h = document.documentElement;
+  progressBar.style.width = ((h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100) + '%';
+  document.getElementById('scroll-indicator').classList.toggle('hidden', h.scrollTop > 100);
+});
+
+// ---- Mouse Glow ----
+const glow = document.getElementById('glow');
+document.addEventListener('mousemove', e => { glow.style.left = e.clientX + 'px'; glow.style.top = e.clientY + 'px'; });
+
+// ---- Splash ----
+const splash = document.getElementById('splash'), content = document.getElementById('content');
+const enterBtn = document.getElementById('enter-btn'), audio = document.getElementById('bg-music');
+const btn = document.getElementById('music-btn');
+let playing = false;
+enterBtn.addEventListener('click', function() {
+  audio.play().then(function() { playing = true; btn.classList.add('playing'); }).catch(function(){});
+  splash.classList.add('hidden'); content.classList.add('show');
+  setTimeout(startTyping, 600);
+});
+btn.addEventListener('click', function() {
+  if (playing) { audio.pause(); btn.classList.remove('playing'); }
+  else { audio.play().catch(function(){}); btn.classList.add('playing'); }
+  playing = !playing;
+});
+
+// ---- Copy Discord ----
+function copyDiscord() {
+  const el = document.querySelector('.social-btn.discord');
+  navigator.clipboard.writeText('mecz.exe').then(function() {
+    el.classList.add('copied');
+    el.querySelector('svg').setAttribute('fill', '#5865F2');
+    setTimeout(function() {
+      el.classList.remove('copied');
+      el.querySelector('svg').setAttribute('fill', '#9ca3af');
+    }, 2000);
+  }).catch(function(){});
+}
+
+// ---- Typing ----
+const phrases = ['Screen Sharing Specialist','Cheat Detection Expert','Anti-Cheat Enthusiast'];
+let pIdx = 0, cIdx = 0, del = false;
+const tel = document.getElementById('typing-sub');
+function startTyping() {
+  function tick() {
+    const cur = phrases[pIdx];
+    if (!del) {
+      tel.innerHTML = cur.substring(0, cIdx + 1) + '<span class="cursor"></span>';
+      cIdx++;
+      if (cIdx === cur.length) { del = true; setTimeout(tick, 2000); return; }
+      setTimeout(tick, 80);
+    } else {
+      tel.innerHTML = cur.substring(0, cIdx) + '<span class="cursor"></span>';
+      cIdx--;
+      if (cIdx === 0) { del = false; pIdx = (pIdx + 1) % phrases.length; setTimeout(tick, 400); return; }
+      setTimeout(tick, 40);
+    }
+  }
+  tick();
+}
+
+// ---- Enhanced Stars ----
+const canvas = document.getElementById('stars-canvas'), ctx = canvas.getContext('2d');
+let stars = [], meteors = [], bursts = [];
+function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+resize(); addEventListener('resize', resize);
+
+// Color palette for stars
+const starColors = [
+  { r: 200, g: 190, b: 255 }, // lavender
+  { r: 255, g: 220, b: 180 }, // warm
+  { r: 180, g: 220, b: 255 }, // cool blue
+  { r: 255, g: 200, b: 220 }, // pink
+  { r: 220, g: 255, b: 200 }, // green tint
+];
+
+class Star {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.size = Math.random() * 2.2 + 0.2;
+    this.baseSize = this.size;
+    this.phase = Math.random() * Math.PI * 2;
+    this.speed = Math.random() * 0.03 + 0.005;
+    this.op = Math.random() * 0.6 + 0.2;
+    this.col = starColors[Math.floor(Math.random() * starColors.length)];
+    this.glowing = Math.random() > 0.7;
+  }
+  update() {
+    this.phase += this.speed;
+    this.size = this.baseSize * (0.6 + 0.4 * Math.sin(this.phase * 1.5));
+  }
+  draw() {
+    const a = this.op * (0.5 + 0.5 * Math.sin(this.phase));
+    const c = this.col;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${c.r},${c.g},${c.b},${a})`;
+    ctx.fill();
+    if (this.glowing) {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size * 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${c.r},${c.g},${c.b},${a * 0.08})`;
+      ctx.fill();
+    }
+    // Cross flare for brighter stars
+    if (this.baseSize > 1.5 && this.glowing) {
+      const f = this.size * 1.8;
+      ctx.strokeStyle = `rgba(${c.r},${c.g},${c.b},${a * 0.15})`;
+      ctx.lineWidth = 0.5;
+      ctx.beginPath(); ctx.moveTo(this.x - f, this.y); ctx.lineTo(this.x + f, this.y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(this.x, this.y - f); ctx.lineTo(this.x, this.y + f); ctx.stroke();
+    }
+  }
+}
+for (let i = 0; i < 150; i++) stars.push(new Star());
+
+// Shooting stars with longer tails
+class Meteor {
+  constructor() {
+    this.x = Math.random() * canvas.width * 1.2;
+    this.y = Math.random() * canvas.height * 0.4;
+    this.len = Math.random() * 120 + 60;
+    this.angle = Math.random() * 0.6 + 0.3 + Math.PI * 0.25;
+    this.speed = Math.random() * 6 + 4;
+    this.life = 1;
+    this.decay = Math.random() * 0.008 + 0.006;
+    this.width = Math.random() * 2 + 1;
+  }
+  update() {
+    this.x -= Math.cos(this.angle) * this.speed;
+    this.y += Math.sin(this.angle) * this.speed;
+    this.life -= this.decay;
+  }
+  draw() {
+    if (this.life <= 0) return;
+    const g = ctx.createLinearGradient(this.x, this.y, this.x - Math.cos(this.angle) * this.len, this.y + Math.sin(this.angle) * this.len);
+    g.addColorStop(0, `rgba(255,255,255,${this.life})`);
+    g.addColorStop(0.05, `rgba(220,200,255,${this.life * 0.6})`);
+    g.addColorStop(0.3, `rgba(200,180,255,${this.life * 0.2})`);
+    g.addColorStop(1, `rgba(200,180,255,0)`);
+    ctx.beginPath();
+    ctx.moveTo(this.x, this.y);
+    ctx.lineTo(this.x - Math.cos(this.angle) * this.len, this.y + Math.sin(this.angle) * this.len);
+    ctx.strokeStyle = g;
+    ctx.lineWidth = this.width;
+    ctx.stroke();
+    // Head glow
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.width * 2, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${this.life * 0.4})`;
+    ctx.fill();
+  }
+}
+
+// Star burst (explosion effect)
+class Burst {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.life = 1;
+    this.particles = [];
+    for (let i = 0; i < 6; i++) {
+      const angle = (Math.PI * 2 / 6) * i + Math.random() * 0.3;
+      this.particles.push({ a: angle, spd: Math.random() * 2 + 1, dist: 0 });
+    }
+  }
+  update() {
+    this.life -= 0.03;
+    for (const p of this.particles) p.dist += p.spd * 0.5;
+  }
+  draw() {
+    if (this.life <= 0) return;
+    for (const p of this.particles) {
+      const x = this.x + Math.cos(p.a) * p.dist;
+      const y = this.y + Math.sin(p.a) * p.dist;
+      ctx.beginPath();
+      ctx.arc(x, y, 1.5 * this.life, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200,190,255,${this.life * 0.8})`;
+      ctx.fill();
+    }
+  }
+}
+
+// Spawn meteors periodically
+setInterval(function() {
+  if (Math.random() > 0.3) {
+    meteors.push(new Meteor());
+  }
+}, 1500);
+
+// Spawn bursts occasionally
+setInterval(function() {
+  if (Math.random() > 0.7) {
+    bursts.push(new Burst(Math.random() * canvas.width, Math.random() * canvas.height * 0.5));
+  }
+}, 2000);
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // Stars
+  for (const s of stars) { s.update(); s.draw(); }
+  
+  // Meteors
+  for (let i = meteors.length - 1; i >= 0; i--) {
+    meteors[i].update();
+    meteors[i].draw();
+    if (meteors[i].life <= 0) meteors.splice(i, 1);
+  }
+  
+  // Bursts
+  for (let i = bursts.length - 1; i >= 0; i--) {
+    bursts[i].update();
+    bursts[i].draw();
+    if (bursts[i].life <= 0) bursts.splice(i, 1);
+  }
+  
+  requestAnimationFrame(animate);
+}
+animate();
+
+// ---- Row stagger ----
+const rows = document.querySelectorAll('.server-table > div');
+const observer = new IntersectionObserver(entries => {
+  for (const e of entries) { if (e.isIntersecting) { e.target.style.opacity = '1'; e.target.style.transform = 'translateY(0)'; } }
+}, { threshold: 0.1 });
+rows.forEach((r, i) => { r.style.opacity = '0'; r.style.transform = 'translateY(12px)'; r.style.transition = `all 0.4s ease ${i * 0.03}s`; observer.observe(r); });
+
+// ---- Lang tags stagger ----
+const langTags = document.querySelectorAll('.lang-bar-tags .lang-tag');
+const langObserver = new IntersectionObserver(function(entries) {
+  for (const e of entries) {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
+  }
+}, { threshold: 0.5 });
+langTags.forEach(function(t, i) {
+  t.style.opacity = '0';
+  t.style.transform = 'translateY(8px)';
+  t.style.transition = 'all 0.4s ease ' + (i * 0.08 + 0.4) + 's';
+  langObserver.observe(t);
+});
+
+// ---- Count-up animation ----
+const statNums = document.querySelectorAll('.stat .num');
+const countObserver = new IntersectionObserver(function(entries) {
+  for (const e of entries) {
+    if (e.isIntersecting) {
+      const el = e.target;
+      const text = el.textContent;
+      const num = parseInt(text);
+      if (isNaN(num)) return;
+      const suffix = text.replace(/[0-9]/g, '');
+      let current = 0;
+      const step = Math.ceil(num / 40);
+      const interval = setInterval(function() {
+        current += step;
+        if (current >= num) {
+          current = num;
+          clearInterval(interval);
+        }
+        el.textContent = current + suffix;
+      }, 30);
+      countObserver.unobserve(el);
+    }
+  }
+}, { threshold: 0.5 });
+statNums.forEach(function(n) { countObserver.observe(n); });
+</script>
+
+</body>
+</html>
+
